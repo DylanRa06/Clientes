@@ -4,9 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.stereotype.Service;
 
 import com.krakedev.clientes.entidades.Cliente;
 
+@Service
 class ServicioClienteTest {
 
     private ServicioCliente servicio;
