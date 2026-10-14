@@ -4,11 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.stereotype.Service;
 
 import com.krakedev.clientes.entidades.Cliente;
 
-@Service
 class ServicioClienteTest {
 
     private ServicioCliente servicio;
@@ -25,6 +23,7 @@ class ServicioClienteTest {
         cliente.setCedula(cedula);
         cliente.setNombre(nombre);
         cliente.setApellido(apellido);
+        cliente.setEmail(nombre.toLowerCase() + "@example.com");
 
         return cliente;
     }
@@ -36,6 +35,7 @@ class ServicioClienteTest {
         Cliente resultado = servicio.crear(cliente);
 
         assertSame(cliente, resultado);
+        assertEquals("dylan@example.com", resultado.getEmail());
         assertEquals(1, servicio.listar().size());
         assertSame(cliente, servicio.buscarPorCedula("001"));
     }
@@ -51,6 +51,7 @@ class ServicioClienteTest {
         assertNull(resultado);
         assertEquals(1, servicio.listar().size());
         assertSame(original, servicio.buscarPorCedula("001"));
+        assertEquals("dylan@example.com", original.getEmail());
     }
 
     @Test
@@ -62,6 +63,7 @@ class ServicioClienteTest {
         servicio.crear(segundo);
 
         assertSame(segundo, servicio.buscarPorCedula("002"));
+        assertEquals("ana@example.com", segundo.getEmail());
     }
 
     @Test
@@ -87,6 +89,8 @@ class ServicioClienteTest {
         assertEquals(2, servicio.listar().size());
         assertSame(primero, servicio.listar().get(0));
         assertSame(segundo, servicio.listar().get(1));
+        assertEquals("dylan@example.com", servicio.listar().get(0).getEmail());
+        assertEquals("ana@example.com", servicio.listar().get(1).getEmail());
     }
 
     @Test
@@ -103,8 +107,9 @@ class ServicioClienteTest {
         assertSame(original, resultado);
         assertEquals("David", resultado.getNombre());
         assertEquals("Perez", resultado.getApellido());
+        assertEquals("david@example.com", resultado.getEmail());
 
-        // Actualizar modifica nombre y apellido, conserva la cedula.
+        // Actualizar modifica nombre, apellido y email, conserva la cedula.
         assertEquals("001", resultado.getCedula());
         assertSame(resultado, servicio.buscarPorCedula("001"));
         assertNull(servicio.buscarPorCedula("999"));
@@ -113,6 +118,7 @@ class ServicioClienteTest {
         // El otro cliente conserva sus datos.
         assertEquals("Juan", otro.getNombre());
         assertEquals("Lopez", otro.getApellido());
+        assertEquals("juan@example.com", otro.getEmail());
     }
 
     @Test
@@ -127,6 +133,7 @@ class ServicioClienteTest {
         assertEquals(1, servicio.listar().size());
         assertEquals("Dylan", original.getNombre());
         assertEquals("Ramon", original.getApellido());
+        assertEquals("dylan@example.com", original.getEmail());
     }
 
     @Test
@@ -141,6 +148,7 @@ class ServicioClienteTest {
         assertNull(servicio.buscarPorCedula("001"));
         assertEquals(1, servicio.listar().size());
         assertSame(segundo, servicio.buscarPorCedula("002"));
+        assertEquals("ana@example.com", segundo.getEmail());
 
         // Ya eliminado, un segundo intento devuelve false.
         assertFalse(servicio.eliminar("001"));
@@ -154,5 +162,15 @@ class ServicioClienteTest {
         assertFalse(servicio.eliminar("999"));
         assertEquals(1, servicio.listar().size());
         assertSame(original, servicio.buscarPorCedula("001"));
+        assertEquals("dylan@example.com", original.getEmail());
+    }
+    @Test
+    void construirClienteConEmail() {
+        Cliente cliente = new Cliente("003", "Paul", "Castillo", "paul@example.com");
+        assertEquals("003", cliente.getCedula());
+        assertEquals("Paul", cliente.getNombre());
+        assertEquals("Castillo", cliente.getApellido());
+        assertEquals("paul@example.com", cliente.getEmail());
+        assertTrue(cliente.toString().contains("paul@example.com"));
     }
 }

@@ -1,0 +1,278 @@
+{
+  "info": {
+    "name": "Clientes - Reto email",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Ejecutar en orden con la aplicacion iniciada y sin un cliente con cedula 123. La lista se guarda en memoria y se reinicia al detener la aplicacion."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Crear cliente con email",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/clientes",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cedula\": \"123\",\n  \"nombre\": \"Dylan\",\n  \"apellido\": \"Ramon\",\n  \"email\": \"dylan@example.com\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Estado HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Cliente creado con email\", function () { pm.expect(pm.response.json()).to.deep.equal({\"cedula\": \"123\", \"nombre\": \"Dylan\", \"apellido\": \"Ramon\", \"email\": \"dylan@example.com\"}); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Consultar cliente y email",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/clientes/123"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Estado HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Email guardado\", function () { pm.expect(pm.response.json().email).to.eql(\"dylan@example.com\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Listar clientes con email",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/clientes"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Estado HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Lista incluye el email\", function () { const cliente = pm.response.json().find(c => c.cedula === \"123\"); pm.expect(cliente).to.be.an(\"object\"); pm.expect(cliente.email).to.eql(\"dylan@example.com\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Rechazar cedula repetida",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/clientes",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cedula\": \"123\",\n  \"nombre\": \"Dylan\",\n  \"apellido\": \"Ramon\",\n  \"email\": \"repetido@example.com\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Estado HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Duplicado rechazado\", function () { pm.expect(pm.response.text().trim()).to.be.oneOf([\"\", \"null\"]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Verificar email original despues del duplicado",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/clientes/123"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Estado HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Email original conservado\", function () { pm.expect(pm.response.json().email).to.eql(\"dylan@example.com\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Actualizar nombre y email",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/clientes/123",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cedula\": \"123\",\n  \"nombre\": \"Dylan Paul\",\n  \"apellido\": \"Ramon\",\n  \"email\": \"dylan.actualizado@example.com\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Estado HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Datos actualizados\", function () { pm.expect(pm.response.json()).to.deep.equal({\"cedula\": \"123\", \"nombre\": \"Dylan Paul\", \"apellido\": \"Ramon\", \"email\": \"dylan.actualizado@example.com\"}); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Consultar email actualizado",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/clientes/123"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Estado HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Email actualizado guardado\", function () { pm.expect(pm.response.json().email).to.eql(\"dylan.actualizado@example.com\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Eliminar cliente",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/clientes/123"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Estado HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Cliente eliminado\", function () { pm.expect(pm.response.json()).to.eql(true); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Verificar que ya no existe",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/clientes/123"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Estado HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Cliente ausente\", function () { pm.expect(pm.response.text().trim()).to.be.oneOf([\"\", \"null\"]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Verificar eliminacion en lista",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/clientes"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Estado HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Lista no incluye al cliente eliminado\", function () { pm.expect(pm.response.json().some(c => c.cedula === \"123\")).to.eql(false); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. Segundo intento de eliminar",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/clientes/123"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Estado HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Cliente ya eliminado\", function () { pm.expect(pm.response.json()).to.eql(false); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

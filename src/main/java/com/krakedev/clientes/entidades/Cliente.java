@@ -5,6 +5,7 @@ public class Cliente {
 	private String cedula;
 	private String nombre;
 	private String apellido;
+	private String email;
 	
 	
 	public Cliente() {}
@@ -18,9 +19,14 @@ public class Cliente {
 	}
 
 
+	public Cliente(String cedula, String nombre, String apellido, String email) {
+		this(cedula, nombre, apellido);
+		this.email = email;
+	}
+
 	@Override
 	public String toString() {
-		return "Cliente [cedula=" + cedula + ", nombre=" + nombre + ", apellido=" + apellido + "]";
+		return "Cliente [cedula=" + cedula + ", nombre=" + nombre + ", apellido=" + apellido + ", email=" + email + "]";
 	}
 
 
@@ -53,5 +59,11 @@ public class Cliente {
 		this.apellido = apellido;
 	}
 
-	
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
 }

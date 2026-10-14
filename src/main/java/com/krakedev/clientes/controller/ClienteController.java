@@ -21,6 +21,7 @@ public class ClienteController {
     private final ServicioCliente servicioCliente =
             new ServicioCliente();
 
+    // El cuerpo JSON incluye cedula, nombre, apellido y email.
     @PostMapping
     public Cliente crear(@RequestBody Cliente cliente) {
         return servicioCliente.crear(cliente);
@@ -36,6 +37,7 @@ public class ClienteController {
         return servicioCliente.buscarPorCedula(cedula);
     }
 
+    // La cedula identifica al cliente; el cuerpo contiene los datos a actualizar.
     @PutMapping("/{cedula}")
     public Cliente actualizar(
             @PathVariable("cedula") String cedula,
